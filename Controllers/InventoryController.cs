@@ -8,20 +8,19 @@ namespace InventoryAPIClient.Controllers
 {
     public class InventoryController : Controller
     {
-        Uri baseAddress = new Uri("https://localhost:7158");
-        HttpClient client;
+        
+        //Uri baseAddress = new Uri("https://localhost:7158");
+       HttpClient client;
 
         public InventoryController()
         {
-            client = new HttpClient();
-            client.BaseAddress = baseAddress;
+            client = new();
+            client.BaseAddress = new Uri("https://localhost:7158");
         }
-
-
 
         public IActionResult Index()
         {
-            List<ProductModel> productModels = new List<ProductModel>();
+            List<ProductModel> productModels = new();
 
             var response = client.GetAsync(client.BaseAddress + "Product").Result;
             if (response.IsSuccessStatusCode)
@@ -62,25 +61,45 @@ namespace InventoryAPIClient.Controllers
             ProductModel productModel = new ProductModel();
             var response = client.GetAsync(client.BaseAddress + "Product/"+id).Result;
 
-
             if (response.IsSuccessStatusCode)
             {
                 var data = response.Content.ReadAsStringAsync().Result;
 
                  productModel = JsonConvert.DeserializeObject<ProductModel>(data);
-
-                
-                return View(productModel);
+                              
+                   return View(productModel);
             }
             else
             {
                 return NotFound();
             }
 
-            
+           }
 
+        
+        public ActionResult Edit(int? id)
+
+        {
+            ProductModel productModel = new ProductModel();
+
+            var response = client.GetAsync(client.BaseAddress + "Product/" + id).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var data = response.Content.ReadAsStringAsync().Result;
+                productModel = JsonConvert.DeserializeObject<ProductModel>(data);
+            }
+
+            return View(productModel);
         }
 
+        [HttpPut("{id}")]
 
+        public ActionResult Edit(ProductModel productModel)
+        {
+            //ProductModel productModel = new ProductModel();
+            var json = JsonConvert.SerializeObject(productModel);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        }
     }
 }
