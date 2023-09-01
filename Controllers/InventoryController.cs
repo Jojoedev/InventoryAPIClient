@@ -8,23 +8,23 @@ namespace InventoryAPIClient.Controllers
 {
     public class InventoryController : Controller
     {
-         Uri baseAddress = new Uri("https://localhost:7158");
+        Uri baseAddress = new Uri("https://localhost:7158");
         HttpClient client;
 
         public InventoryController()
         {
-            client =new HttpClient();
+            client = new HttpClient();
             client.BaseAddress = baseAddress;
         }
-        
 
-        
+
+
         public IActionResult Index()
         {
             List<ProductModel> productModels = new List<ProductModel>();
 
-            var response = client.GetAsync(client.BaseAddress +"Product").Result;
-            if(response.IsSuccessStatusCode)
+            var response = client.GetAsync(client.BaseAddress + "Product").Result;
+            if (response.IsSuccessStatusCode)
             {
                 var jsonContent = response.Content.ReadAsStringAsync().Result;
 
@@ -56,6 +56,30 @@ namespace InventoryAPIClient.Controllers
             return View();
         }
 
+        [HttpGet("{id}")]
+        public ActionResult Details(int? id)
+        {
+            ProductModel productModel = new ProductModel();
+            var response = client.GetAsync(client.BaseAddress + "Product/"+id).Result;
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = response.Content.ReadAsStringAsync().Result;
+
+                 productModel = JsonConvert.DeserializeObject<ProductModel>(data);
+
+                
+                return View(productModel);
+            }
+            else
+            {
+                return NotFound();
+            }
+
+            
+
+        }
 
 
     }
