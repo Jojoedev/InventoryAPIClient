@@ -92,14 +92,19 @@ namespace InventoryAPIClient.Controllers
             return View(productModel);
         }
 
-        [HttpPut("{id}")]
+        [HttpPost]
 
-        public ActionResult Edit(ProductModel productModel)
+        public ActionResult Edit(ProductModel model)
         {
             //ProductModel productModel = new ProductModel();
-            var json = JsonConvert.SerializeObject(productModel);
+            var json = JsonConvert.SerializeObject(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+            var response = client.PutAsync(client.BaseAddress + "Product/" + model.Id, content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return NoContent();
         }
     }
 }
